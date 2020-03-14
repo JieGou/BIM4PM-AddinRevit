@@ -23,7 +23,7 @@
             bool isAuthenticated = false;
             try
             {
-              if (!CheckForInternetConnection())
+                if (!CheckForInternetConnection())
                 {
                     MessageBox.Show("Make sure you have internet");
                     return isAuthenticated;
@@ -35,34 +35,37 @@
                 req.RequestFormat = RestSharp.DataFormat.Json;
 
                 req.AddJsonBody(body);
-
+                //验证的过程不懂
                 IRestResponse<Token> res = Route.Client.Execute<Token>(req);
 
-               
                 AuthProvider.Instance.token = new Token
                 {
                     token = res.Data.token
                 };
                 statusCode = res.StatusCode;
 
-                if (statusCode.ToString() == "OK") return isAuthenticated = true;
+                if (statusCode.ToString() == "OK")
+                {
+                    return isAuthenticated = true;
+                }
             }
             catch (System.Exception)
             {
                 MessageBox.Show("Sorry! Server error, return later...");
                 return isAuthenticated;
             }
-           
 
             return isAuthenticated;
         }
+
         private bool CheckForInternetConnection()
         {
             try
             {
                 using (var client = new WebClient())
                 {
-                    using (var stream = client.OpenRead("http://www.google.com"))
+                    //using (var stream = client.OpenRead("http://www.google.com"))
+                    using (var stream = client.OpenRead("https://cn.bing.com/"))
                     {
                         return true;
                     }

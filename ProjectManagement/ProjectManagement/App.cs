@@ -70,45 +70,44 @@ namespace ProjectManagement
 
             PaletteUtilities.RegisterPalette(uicapp);
 
-
-
             _uicapp = uicapp;
 
-            // Obtenir le chemin du dll assembly
+            // 获取程序集 dll 的路径
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
 
-            /************************************Cr�ation de l'onglet ***********************************************/
-            string nomOnglet = "Manh Hoang";
-            Onglet onglet = new Onglet();
-            onglet.Ajouter(uicapp, nomOnglet);
-            Bouton button = new Bouton();
+            /************************************创建选项卡 ***********************************************/
+            string tabName = "Manh Hoang";
+            MyRibbonTab myRibbonTab = new MyRibbonTab();
+            myRibbonTab.Add(uicapp, tabName);
+            MyButton button = new MyButton();
 
             //********************Create panel*******************
 
-            Ruban panneau = new Ruban();
-            RibbonPanel rbAuth = panneau.Ajouter(uicapp, nomOnglet, "Authentification");
-            RibbonPanel rbVerification = panneau.Ajouter(uicapp, nomOnglet, "Verification");
-            RibbonPanel rbDatabase = panneau.Ajouter(uicapp, nomOnglet, "Database");
-            RibbonPanel ribbonPanel = panneau.Ajouter(uicapp, nomOnglet, "Update Data");
-            RibbonPanel rib_panelProprety = panneau.Ajouter(uicapp, nomOnglet, "Palette d'historiques");
+            MyRibbonPanel panel = new MyRibbonPanel();
+            RibbonPanel rbAuth = panel.Add(uicapp, tabName, "Authentification");
+            RibbonPanel rbVerification = panel.Add(uicapp, tabName, "Verification");
+            RibbonPanel rbDatabase = panel.Add(uicapp, tabName, "Database");
+            RibbonPanel ribbonPanel = panel.Add(uicapp, tabName, "Update Data");
+            RibbonPanel rib_panelProprety = panel.Add(uicapp, tabName, "history Palette");
             rbDatabase.Visible = false;
             ribbonPanel.Visible = false;
             rib_panelProprety.Visible = false;
-            
 
-            PushButtonData login = new PushButtonData("Connecter", "Login", thisAssemblyPath, "ProjectManagement.CmdRevit.CmdLogin");
-            login.AvailabilityClassName = "ProjectManagement.AvailabilityButtonLogin";
+            PushButtonData login = new PushButtonData("Connecter", "Login", thisAssemblyPath, "ProjectManagement.CmdRevit.CmdLogin")
+            {
+                AvailabilityClassName = "ProjectManagement.AvailabilityButtonLogin"
+            };
             _button = rbAuth.AddItem(login);
 
             rbAuth.AddSeparator();
 
-            PushButtonData logout = new PushButtonData("Logout", "Logout", thisAssemblyPath, "ProjectManagement.CmdRevit.CmdLogout");
-            logout.AvailabilityClassName = "ProjectManagement.AvailabilityButtonLogout";
+            PushButtonData logout = new PushButtonData("Logout", "Logout", thisAssemblyPath, "ProjectManagement.CmdRevit.CmdLogout")
+            {
+                AvailabilityClassName = "ProjectManagement.AvailabilityButtonLogout"
+            };
             rbAuth.AddItem(logout);
 
-             
-
-            uicapp.ViewActivated += new EventHandler<ViewActivatedEventArgs>(onViewActivated); //for panel proprety 
+            uicapp.ViewActivated += new EventHandler<ViewActivatedEventArgs>(onViewActivated); //for panel proprety
             uicapp.ControlledApplication.DocumentOpened += OnDocumentOpened;
             uicapp.ControlledApplication.DocumentCreated += OnDocumentCreated;
             uicapp.ControlledApplication.DocumentClosing += OnDocumentClosing;
@@ -130,7 +129,9 @@ namespace ProjectManagement
             Document doc = args.GetDocument();
             if (ModelProvider.Instance.CurrentModel == null
                 || ModelProvider.Instance.DicRevitElements == null)
+            {
                 return;
+            }
 
             if (doc.Title == ModelProvider.Instance.CurrentModel.Title)
             {
@@ -150,9 +151,10 @@ namespace ProjectManagement
                             ModelProvider.Instance.DicRevitElements.Remove(e.UniqueId);
                             ModelProvider.Instance.DicRevitElements.Add(e.UniqueId, revitElement);
                         }
-
                         else
+                        {
                             ModelProvider.Instance.DicRevitElements.Add(e.UniqueId, revitElement);
+                        }
                     }
                 }
                 foreach (ElementId id in args.GetDeletedElementIds())
@@ -165,12 +167,9 @@ namespace ProjectManagement
                             break;
                         }
                     }
-
-
                 }
                 foreach (ElementId id in args.GetModifiedElementIds())
                 {
-
                     Element e = doc.GetElement(id);
                     if (null != e.Category
                           && 0 < e.Parameters.Size
@@ -184,7 +183,6 @@ namespace ProjectManagement
                             ModelProvider.Instance.DicRevitElements.Add(e.UniqueId, revitElement);
                         }
                     }
-
                 }
             }
         }
@@ -227,7 +225,6 @@ namespace ProjectManagement
         /// <param name="args">The args<see cref="DocumentCreatedEventArgs"/></param>
         private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs args)
         {
-
             ModelProvider.Instance.Models.Add(args.Document);
         }
 
@@ -238,7 +235,6 @@ namespace ProjectManagement
         /// <param name="args">The args<see cref="DocumentOpenedEventArgs"/></param>
         private static void OnDocumentOpened(object source, DocumentOpenedEventArgs args)
         {
-
             ModelProvider.Instance.Models.Add(args.Document);
         }
 
@@ -252,11 +248,13 @@ namespace ProjectManagement
             //if (args.Document.Title == ModelProvider.Instance.CurrentModel.Title) AuthProvider.Instance.Disconnect();
             if (ModelProvider.Instance.CurrentModel != null && args.Document.Title == ModelProvider.Instance.CurrentModel.Title)
             {
-                 
                 AuthProvider.Instance.Logout();
             }
             var docToRemove = ModelProvider.Instance.Models.Where(x => x.Title == args.Document.Title);
-            if (docToRemove != null) ModelProvider.Instance.Models.Remove(docToRemove.FirstOrDefault());
+            if (docToRemove != null)
+            {
+                ModelProvider.Instance.Models.Remove(docToRemove.FirstOrDefault());
+            }
         }
 
         /// <summary>
@@ -273,7 +271,6 @@ namespace ProjectManagement
         /// </summary>
         private void DockablePanelActivated()
         {
-
             PanelProprety panelPropreties = new PanelProprety();
             _panelProprety = panelPropreties;
             DockablePaneId paneId = new DockablePaneId(new Guid("{D7C963CE-B7CA-426A-8D51-6E8254D21157}"));
@@ -303,10 +300,13 @@ namespace ProjectManagement
         public void TextChangedButton()
         {
             string s = _button.ItemText;
-            _button.ItemText = s.Equals("Login") ? ("Vous �tes connect� au projet" + Environment.NewLine + _projectName) : "Login";
+            _button.ItemText = s.Equals("Login") ? ("You are connected to the project" + Environment.NewLine + _projectName) : "Login";
         }
     }
 
+    /// <summary>
+    /// 登录按钮的可用性
+    /// </summary>
     public class AvailabilityButtonLogin : IExternalCommandAvailability
     {
         /// <summary>
@@ -321,10 +321,16 @@ namespace ProjectManagement
             {
                 return true;
             }
-            else return false;
+            else
+            {
+                return false;
+            }
         }
     }
 
+    /// <summary>
+    /// 退出按钮的可用性
+    /// </summary>
     public class AvailabilityButtonLogout : IExternalCommandAvailability
     {
         /// <summary>
@@ -339,7 +345,10 @@ namespace ProjectManagement
             {
                 return false;
             }
-            else return true;
+            else
+            {
+                return true;
+            }
         }
     }
 
