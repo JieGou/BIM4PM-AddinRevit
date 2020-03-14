@@ -6,84 +6,100 @@
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
 
-    internal class Onglet
+    /// <summary>
+    /// 选项卡
+    /// </summary>
+    internal class MyRibbonTab
     {
         /// <summary>
-        /// The Ajouter
+        /// 添加选项卡
         /// </summary>
         /// <param name="application">The application<see cref="UIControlledApplication"/></param>
-        /// <param name="nomOnglet">The nomOnglet<see cref="string"/></param>
-        public void Ajouter(UIControlledApplication application, string nomOnglet)
+        /// <param name="name">选项名称 <see cref="string"/></param>
+        public void Add(UIControlledApplication application, string name)
         {
-            application.CreateRibbonTab(nomOnglet);
+            application.CreateRibbonTab(name);
         }
     }
 
-    internal class Ruban
+    /// <summary>
+    /// 面板
+    /// </summary>
+    internal class MyRibbonPanel
     {
         /// <summary>
-        /// The Ajouter
+        /// 添加面板
         /// </summary>
         /// <param name="application">The application<see cref="UIControlledApplication"/></param>
-        /// <param name="NomOnglet">The NomOnglet<see cref="string"/></param>
-        /// <param name="NomRuban">The NomRuban<see cref="string"/></param>
+        /// <param name="tabName">The tabName<see cref="string"/></param>
+        /// <param name="panelName">The panelName<see cref="string"/></param>
         /// <returns>The <see cref="RibbonPanel"/></returns>
-        public RibbonPanel Ajouter(UIControlledApplication application, string NomOnglet, string NomRuban)
+        public RibbonPanel Add(UIControlledApplication application, string tabName, string panelName)
         {
-            return application.CreateRibbonPanel(NomOnglet, NomRuban);
+            return application.CreateRibbonPanel(tabName, panelName);
         }
     }
 
-    internal class Bouton
+    /// <summary>
+    /// 按钮
+    /// </summary>
+    internal class MyButton
     {
         /// <summary>
-        /// Ajoute un bouton dans le complément RZB.
+        /// 添加一个按钮
         /// </summary>
-        /// <param name="NomPanneau"></param>
-        /// <param name="NomBouton"></param>
-        /// <param name="NomImage"></param>
-        /// <param name="NomClass"></param>
-        /// <param name="CheminAssembleur"></param>
-        /// <param name="CommentaireBtn"></param>
-        public void Ajouter(RibbonPanel NomPanneau, string NomBouton, string NomImage, string NomClass,
-                            string CheminAssembleur, string CommentaireBtn)
+        /// <param name="panelName"></param>
+        /// <param name="buttonName"></param>
+        /// <param name="imageName"></param>
+        /// <param name="className"></param>
+        /// <param name="assembly"></param>
+        /// <param name="tooltip"></param>
+        public void Add(RibbonPanel panelName, string buttonName, string imageName, string className,
+                            string assembly, string tooltip)
         {
-            // Créer un bouton dans le panneau
-            PushButtonData b1Data = new PushButtonData("cmd" + NomBouton, NomBouton + System.Environment.NewLine,
-                                                        CheminAssembleur, NomClass);
+            // 在面板中创建按钮
+            PushButtonData b1Data = new PushButtonData("cmd" + buttonName,
+                buttonName + System.Environment.NewLine,
+                assembly,
+                className);
 
-            PushButton pb1 = NomPanneau.AddItem(b1Data) as PushButton;
-            pb1.ToolTip = CommentaireBtn;
+            PushButton pb1 = panelName.AddItem(b1Data) as PushButton;
+            pb1.ToolTip = tooltip;
             ContextualHelp contextHelp = new ContextualHelp(ContextualHelpType.Url, "http://www.autodesk.com");
             pb1.SetContextualHelp(contextHelp);
 
             // Recherche de l'image du bouton dans les ressources.
-            pb1.LargeImage = OutilImage.ImageSource("TEST.Resources." + NomImage);
+            pb1.LargeImage = ImageUtil.ImageSource("TEST.Resources." + imageName);
         }
     }
 
-    internal class Separateur
+    /// <summary>
+    /// 分隔符
+    /// </summary>
+    internal class MySeparator
     {
         /// <summary>
-        /// Crée un séparateur
+        /// 创建分隔符
         /// </summary>
-        /// <param name="NomPanneau"></param>
-        public static void Ajouter(RibbonPanel NomPanneau)
+        /// <param name="panelName">面板名称</param>
+        public static void Add(RibbonPanel panelName)
         {
-            NomPanneau.AddSeparator();
+            panelName.AddSeparator();
         }
     }
 
-    internal class OutilImage
+    /// <summary>
+    /// 图像工具
+    /// </summary>
+    internal class ImageUtil
     {
         /// <summary>
-        /// Récupère une image (png, ico, jpeg, bmp) dans les ressources.
+        /// 从资源中恢复图像（png、ico、jpeg、bmp）
         /// </summary>
         /// <param name="nomImage"></param>
         /// <returns></returns>
         public static ImageSource ImageSource(string nomImage)
         {
-
             Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(nomImage);
 
             if (Path.GetExtension(nomImage).ToLower().EndsWith(".png")) // Cas png
